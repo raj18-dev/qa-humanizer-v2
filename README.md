@@ -4,31 +4,38 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Perspective: 100% Third-Person](https://img.shields.io/badge/Perspective-100%25%20Third--Person-blueviolet.svg)]()
 [![Compliance: DrillBit & ZeroGPT](https://img.shields.io/badge/AI%20Detection-%3C10%25-brightgreen.svg)]()
+[![Depth: 600-650 Words](https://img.shields.io/badge/Depth-600--650%20words-informational.svg)]()
 [![Compilation: Word .docx](https://img.shields.io/badge/Output-Executive%20Word%20Doc-success.svg)]()
 
 `qa-humanizer-v2` is the second-generation academic question-answering and humanization engine engineered specifically for **university examinations, college assignments, and formal academic submissions**.
 
 It completely eliminates artificial first-person roleplay (`"ours"`, `"we"`, `"I"`, `"our chamber"`), producing **100% natural, objective, third-person scholarly answers** written from the perspective of an outstanding university student.
 
-It enforces the **DrillBit Dual-Compliance Standard** (< 10% AI on live ZeroGPT/Turnitin, < 10% Plagiarism), strict **700 to 800 words depth**, and compiles all deliverables into styled Microsoft Word documents (`.docx`).
+It enforces the **DrillBit Dual-Compliance Standard** (< 10% AI on live ZeroGPT/Turnitin, < 10% Plagiarism), strict **600 to 650 words depth**, and compiles all deliverables into styled Microsoft Word documents (`.docx`).
 
 ---
 
-## 👥 Multi-Subagent Architecture
+## ⚡ Mandatory Turn 1 Architecture: Immediate Parallel Subagent Dispatch
+
+To prevent tool delays and parent-level exploration latency, `qa-humanizer-v2` strictly enforces an immediate Turn-1 parallel dispatch protocol:
+
+1. **Zero Parent-Level Exploration:** The parent agent is strictly forbidden from writing answers in the parent chat, running local directory scans, or awaiting manual user prompts.
+2. **Immediate Turn-1 Fan-Out:** The parent agent parses the assignment into questions ($Q_1 \dots Q_N$) and calls `invoke_subagent` $N$ times concurrently in Turn 1.
+3. **Deterministic `worker_task.py` Execution:** Each subagent runs the underlying verification engine (`worker_task.py`) with `--min-words 600 --max-words 650 --max-retries 10` for closed-loop compliance before reporting back.
 
 ```mermaid
 flowchart TD
     User([User Assignment Questions]) --> Antigravity[Antigravity Parent Agent]
     
     subgraph SubagentPool ["Visible Parallel Subagents in UI"]
-        Antigravity -->|invoke_subagent| SA1["Subagent 1 (Role: Q1 Student Scholar)"]
-        Antigravity -->|invoke_subagent| SA2["Subagent 2 (Role: Q2 Student Scholar)"]
-        Antigravity -->|invoke_subagent| SA3["Subagent 3 (Role: Q3 Student Scholar)"]
+        Antigravity -->|Turn 1: invoke_subagent| SA1["Subagent 1 (Role: Q1 Student Scholar)"]
+        Antigravity -->|Turn 1: invoke_subagent| SA2["Subagent 2 (Role: Q2 Student Scholar)"]
+        Antigravity -->|Turn 1: invoke_subagent| SA3["Subagent 3 (Role: Q3 Student Scholar)"]
     end
     
-    SA1 -->|Third-Person Humanizer & Audit| O1[output/subagent_q1.json]
-    SA2 -->|Third-Person Humanizer & Audit| O2[output/subagent_q2.json]
-    SA3 -->|Third-Person Humanizer & Audit| O3[output/subagent_q3.json]
+    SA1 -->|worker_task.py: Automated <10% Loop| O1[output/subagent_q1.json]
+    SA2 -->|worker_task.py: Automated <10% Loop| O2[output/subagent_q2.json]
+    SA3 -->|worker_task.py: Automated <10% Loop| O3[output/subagent_q3.json]
     
     O1 & O2 & O3 --> Assembler[Word Docx Compilation Engine]
     Assembler --> Docx["Documents/assignment/<Dossier_Name>.docx"]
@@ -56,28 +63,31 @@ flowchart TD
 
 ---
 
-## 🚀 Installation & Setup
+## ⏱️ Execution & Compilation Pipeline
 
-### 1. Setup Virtual Environment
-```bash
-git clone https://github.com/raj18-dev/qa-humanizer-v2.git
-cd qa-humanizer-v2
-
-python -m venv .venv
-
-# Windows (PowerShell)
-.\.venv\Scripts\activate
-
-# Linux / macOS
-source .venv/bin/activate
-
-pip install -r requirements.txt
+### 1. Subagent Deterministic Worker Execution
+```powershell
+& "path/to/venv/python.exe" "scripts/worker_task.py" `
+    --question "<question_text>" `
+    --number <N> `
+    --min-words 600 `
+    --max-words 650 `
+    --max-retries 10 `
+    --out "output/subagent_q<N>.json"
 ```
 
 ### 2. Standalone Verification CLI
 ```bash
 # Verify draft answer for third-person compliance, 0 dashes, and live ZeroGPT check
 python scripts/verify.py --file path/to/answer.txt --live-zerogpt
+```
+
+### 3. Parent Dossier Assembly
+```powershell
+& "path/to/venv/python.exe" "scripts/assemble_results.py" `
+    --inputs "output/subagent_q1.json" "output/subagent_q2.json" "output/subagent_q3.json" `
+    --out "output/<filename>.docx" `
+    --title "<Assignment Title>"
 ```
 
 ---
@@ -94,7 +104,7 @@ In your Antigravity chat:
 ```text
 /qa-humanizer-v2 1. Define MIS... 2. Compare TPS, MIS, DSS... 3. Explain Freedom of Commercial Speech...
 ```
-Antigravity automatically spawns visible dedicated specialist subagents in parallel for each question, enforces 700–800 words depth and DrillBit dual-compliance, and compiles the final Word dossier into `Documents/assignment/`.
+Antigravity automatically spawns visible dedicated specialist subagents in parallel for each question, enforces 600–650 words depth and DrillBit dual-compliance, and compiles the final Word dossier into `Documents/assignment/`.
 
 ---
 
