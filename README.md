@@ -39,8 +39,27 @@ flowchart TD
     
     O1 & O2 & O3 --> Assembler[Word Docx Compilation Engine]
     Assembler --> Docx["Documents/assignment/<Dossier_Name>.docx"]
-    Assembler --> MD["Documents/assignment/<Dossier_Name>.md"]
 ```
+
+---
+
+## 📄 Document Formatting & Clean Academic Deliverable
+
+Every generated Microsoft Word assignment includes:
+
+1. **Institutional Front Cover Page (Page 1):**
+   - Header: IPS Academy, Institute of Business Management and Research, Indore
+   - Accreditation: (NAAC A++ Accredited, An Autonomous Institute, Established in 1994)
+   - Affiliation: Affiliated to Devi Ahilya University, Indore (M.P.) India
+   - Assignment: “Internal Exam Assignment: Nov. 2026”
+   - Class: BBA III | Sec.: E (DA) | Subject: Yoga & Meditation | Code: 74248 | Roll No: 61 | Date: 11/11/26
+   - Submission: Submitted By: Student Name / Submitted To: Faculty Name
+2. **Clean Question & Answer Format (Page 2+):**
+   - Question number heading only (`Question 1`, `Question 2`)
+   - `Answer:` label followed by humanized text
+   - Zero question text written in the document
+   - Zero AI percentages, retry counts, or verification badges
+   - Zero Verification Audit Appendix pages
 
 ---
 
@@ -82,12 +101,13 @@ flowchart TD
 python scripts/verify.py --file path/to/answer.txt --live-zerogpt
 ```
 
-### 3. Parent Dossier Assembly
+### 3. Parent Dossier Assembly with Cover Page
 ```powershell
 & "path/to/venv/python.exe" "scripts/assemble_results.py" `
     --inputs "output/subagent_q1.json" "output/subagent_q2.json" "output/subagent_q3.json" `
     --out "output/<filename>.docx" `
-    --title "<Assignment Title>"
+    --title "“Internal Exam Assignment: Nov. 2026”" `
+    --subject "Yoga & Meditation"
 ```
 
 ---
@@ -97,14 +117,7 @@ python scripts/verify.py --file path/to/answer.txt --live-zerogpt
 ### Installation
 Copy this repository into your Antigravity skills directory:
 - **Global:** `C:\Users\<username>\.gemini\config\skills\qa-humanizer-v2\`
-- **Project-Scoped:** `.agents\skills\qa-humanizer-v2\`
-
-### Invocation
-In your Antigravity chat:
-```text
-/qa-humanizer-v2 1. Define MIS... 2. Compare TPS, MIS, DSS... 3. Explain Freedom of Commercial Speech...
-```
-Antigravity automatically spawns visible dedicated specialist subagents in parallel for each question, enforces 600–650 words depth and DrillBit dual-compliance, and compiles the final Word dossier into `Documents/assignment/`.
+- **Obsidian Mirror:** `C:\Users\<username>\OneDrive\Documents\Obsidian Vault\Antigravity\Skills\qa-humanizer-v2\`
 
 ---
 
