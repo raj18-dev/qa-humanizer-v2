@@ -84,7 +84,7 @@ Every generated Microsoft Word assignment includes:
 
 ## ⏱️ Execution & Compilation Pipeline
 
-### 1. Subagent Deterministic Worker Execution
+### 1. Subagent Deterministic Worker Execution (Live ZeroGPT API)
 ```powershell
 & "path/to/venv/python.exe" "scripts/worker_task.py" `
     --question "<question_text>" `
@@ -92,7 +92,8 @@ Every generated Microsoft Word assignment includes:
     --min-words 600 `
     --max-words 650 `
     --max-retries 10 `
-    --out "output/subagent_q<N>.json"
+    --detector zerogpt_api `
+    --out "output/<job_id>_subagent_q<N>.json"
 ```
 
 ### 2. Standalone Verification CLI
@@ -104,7 +105,7 @@ python scripts/verify.py --file path/to/answer.txt --live-zerogpt
 ### 3. Parent Dossier Assembly with Cover Page
 ```powershell
 & "path/to/venv/python.exe" "scripts/assemble_results.py" `
-    --inputs "output/subagent_q1.json" "output/subagent_q2.json" "output/subagent_q3.json" `
+    --inputs "output/<job_id>_subagent_q1.json" "output/<job_id>_subagent_q2.json" "output/<job_id>_subagent_q3.json" `
     --out "output/<filename>.docx" `
     --title "“Internal Exam Assignment: Nov. 2026”" `
     --subject "Yoga & Meditation"
